@@ -14,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
 import com.github.lyokofirelyte.VariableTriggers.VTParser;
 import com.github.lyokofirelyte.VariableTriggers.VariableTriggers;
@@ -31,7 +32,10 @@ public class VTListener implements AR {
 
 	@EventHandler(ignoreCancelled = false)
 	public void onInteract(PlayerInteractEvent e){
-		
+		if (e.getHand() == EquipmentSlot.OFF_HAND) {
+			return;
+		}
+
 		if (e.getAction() == Action.PHYSICAL || e.getClickedBlock() == null){
 			return;
 		}

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -41,36 +43,40 @@ public class VTSetup {
 	public Map<String, Object> registeredClasses = new HashMap<String, Object>();
     public Map<List<String>, Object> commandMap = new HashMap<>();
     public List<String> syncTasks = new ArrayList<String>();
-    public String base = "./plugins/VariableTriggers/";
+	public String base;
 	
 	public VTSetup(VariableTriggers i){
 		main = i;
 		reg = new VTRegistry(main);
+		base = main.getDataFolder().getPath() + File.separator;
 	}
 	
 	public VTSetup start(){
+		try {
+			migrateLegacyDataFolder();
+		} catch (IOException e) {
+			throw new IllegalStateException("Could not migrate VariableTriggers data into " + base, e);
+		}
+		new File(base + "scripts/").mkdirs();
+		new File(base + "inventories/").mkdirs();
 		
 		main.settings = new VTSettings(main);
 		main.vars = new VTVars(main);
 		
 		main.clicks = new VTMap<Object, Object>();
-		main.clicks.makePath("./plugins/VariableTriggers/events/triggers", "ClickTriggers.yml");
+		main.clicks.makePath(base + "events/triggers", "ClickTriggers.yml");
 		main.clicks.load();
 		
 		main.areas = new VTMap<Object, Object>();
-		main.areas.makePath("./plugins/VariableTriggers/events/triggers", "AreaTriggers.yml");
+		main.areas.makePath(base + "events/triggers", "AreaTriggers.yml");
 		main.areas.load();
 		
 		main.walks = new VTMap<Object, Object>();
-		main.walks.makePath("./plugins/VariableTriggers/events/triggers", "WalkTriggers.yml");
+		main.walks.makePath(base + "events/triggers", "WalkTriggers.yml");
 		main.walks.load();
 		
 		if (!main.settings.getBool(VTConfig.FIRST_RUN)){
 			firstRun();
-		} else if (!main.settings.getBool(VTConfig.FIRST_RUN)){
-			new File(base + "scripts/").mkdirs();
-			new File(base + "inventories/").mkdirs();
-			main.settings.set(VTConfig.FIRST_RUN, true);
 		}
 		
 		main.settings.set(VTData.PLACEHOLDERS, YamlConfiguration.loadConfiguration(new InputStreamReader(main.getResource("placeholders.yml"))).getStringList("placeholders"));
@@ -138,6 +144,34 @@ public class VTSetup {
 		//main.we.hookSetup();
 
 		return this;
+	}
+
+	private void migrateLegacyDataFolder() throws IOException {
+		File legacyFolder = new File("./plugins/VariableTriggers");
+		File dataFolder = main.getDataFolder();
+		if (!legacyFolder.isDirectory() || legacyFolder.getCanonicalFile().equals(dataFolder.getCanonicalFile())) {
+			return;
+		}
+
+		if (!dataFolder.exists()) {
+			java.nio.file.Files.move(legacyFolder.toPath(), dataFolder.toPath());
+			main.logger.calmInfo("Migrated plugin data to " + dataFolder.getPath() + ".");
+			return;
+		}
+
+		Path legacyRoot = legacyFolder.toPath();
+		try (Stream<Path> paths = java.nio.file.Files.walk(legacyRoot)) {
+			for (Path source : (Iterable<Path>) paths::iterator) {
+				Path relative = legacyRoot.relativize(source);
+				Path destination = dataFolder.toPath().resolve(relative);
+				if (java.nio.file.Files.isDirectory(source)) {
+					java.nio.file.Files.createDirectories(destination);
+				} else if (!java.nio.file.Files.exists(destination)) {
+					java.nio.file.Files.copy(source, destination);
+				}
+			}
+		}
+		main.logger.warning("Merged missing files from plugins/VariableTriggers into " + dataFolder.getPath() + ". The legacy folder was retained.");
 	}
 	
 	public void helpFiles(){

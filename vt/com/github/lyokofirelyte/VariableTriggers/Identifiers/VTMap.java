@@ -12,6 +12,8 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import com.github.lyokofirelyte.VariableTriggers.Utils.VTPaths;
+
 public class VTMap<K, V> extends HashMap<Object, Object> {
 
 	private static final long serialVersionUID = System.currentTimeMillis();
@@ -238,7 +240,7 @@ public class VTMap<K, V> extends HashMap<Object, Object> {
 	}
 	
 	public void makePath(String folder, String name){
-		
+		folder = VTPaths.resolveLegacyPath(folder);
 		set(VTData.FILE_PATH, folder + "/" + name);
 		
 		File folderFile = new File(folder);
@@ -293,7 +295,7 @@ public class VTMap<K, V> extends HashMap<Object, Object> {
 				for (String script : getScripts().keySet()){
 					
 					if (file == null || !yamls.containsKey(script.split("_")[0])){
-						file = new File("./plugins/VariableTriggers/scripts/" + script.split("_")[0] + ".script.yml");
+						file = VTPaths.dataFile("scripts/" + script.split("_")[0] + ".script.yml");
 						scriptYaml = YamlConfiguration.loadConfiguration(file);
 						yamls.put(script.split("_")[0], scriptYaml);
 						files.put(script.split("_")[0], file);

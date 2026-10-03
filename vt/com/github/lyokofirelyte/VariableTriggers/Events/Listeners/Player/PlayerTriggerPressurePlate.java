@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.Vector;
 
 import com.github.lyokofirelyte.VariableTriggers.VTParser;
@@ -24,7 +25,10 @@ public class PlayerTriggerPressurePlate extends VTMap<Object, Object> implements
 	
 	@EventHandler (ignoreCancelled = false)
 	public void onClick(PlayerInteractEvent e){
-		
+		if (e.getHand() == EquipmentSlot.OFF_HAND) {
+			return;
+		}
+
 		if (getList("Worlds").contains(e.getPlayer().getWorld().getName())){
 			if (getLong("ActiveCooldown") <= System.currentTimeMillis()){
 				if (getBool("Cancelled")){

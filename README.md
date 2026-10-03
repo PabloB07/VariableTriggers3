@@ -44,6 +44,8 @@ the server API, and Vault remains optional for economy, chat, or permission inte
 
 After starting the server, use `/vt ?` for the in-game help. Script directives include:
 
+- `/vt reload` reloads scripts and trigger files without restarting the server. Plugin data lives under
+  `plugins/VariableTriggers3/`; existing data in `plugins/VariableTriggers/` is migrated or merged on startup.
 - `@SCOREBOARD TITLE <text>`, `@SCOREBOARD LINE <1-15> <text>`, and `@SCOREBOARD REMOVE`. Add a player name after
   `@SCOREBOARD` to target an online player instead of the player running the script.
 - `@MODIFYINV SET <slot> <material> [amount] [name]`, `@MODIFYINV REMOVE <slot>`, and `@MODIFYINV CLEAR`. These edit
@@ -122,6 +124,8 @@ servidor y Vault sigue siendo opcional para integraciones de economía, chat o p
 
 Después de iniciar el servidor, usa `/vt ?` para consultar la ayuda dentro del juego. Las directivas de scripts incluyen:
 
+- `/vt reload` vuelve a cargar scripts y disparadores sin reiniciar el servidor. Los datos quedan en
+  `plugins/VariableTriggers3/`; los datos existentes en `plugins/VariableTriggers/` se migran o combinan al iniciar.
 - `@SCOREBOARD TITLE <texto>`, `@SCOREBOARD LINE <1-15> <texto>` y `@SCOREBOARD REMOVE`. Agrega el nombre de un jugador
   después de `@SCOREBOARD` para actualizar a otro jugador conectado.
 - `@MODIFYINV SET <ranura> <material> [cantidad] [nombre]`, `@MODIFYINV REMOVE <ranura>` y `@MODIFYINV CLEAR`. Modifican

@@ -24,6 +24,7 @@ import com.github.lyokofirelyte.VariableTriggers.Identifiers.VTCommand;
 import com.github.lyokofirelyte.VariableTriggers.Identifiers.VTConfig;
 import com.github.lyokofirelyte.VariableTriggers.Identifiers.VTMap;
 import com.github.lyokofirelyte.VariableTriggers.Utils.VTUtils;
+import com.github.lyokofirelyte.VariableTriggers.Utils.VTPaths;
 
 public class VTCommandMain implements AR {
 	
@@ -34,7 +35,7 @@ public class VTCommandMain implements AR {
 		main = i;
 		perms = new String[][] {
 			mkStr("debug advanced", "vtriggers.admin"),
-			mkStr("reloadtriggers rt savetriggers st savevars sv savescripts ss reloadscripts rs", "vtriggers.use.command"),
+			mkStr("reload reloadtriggers rt savetriggers st savevars sv savescripts ss reloadscripts rs", "vtriggers.use.command"),
 		};
 	}
 
@@ -82,6 +83,10 @@ public class VTCommandMain implements AR {
 					
 				break;
 				
+				case "reload":
+					reloadAll(p);
+				break;
+
 				case "reloadscripts": case "rs":
 					
 					main.setup.scripts();
@@ -203,6 +208,9 @@ public class VTCommandMain implements AR {
 					
 					for (String msg : new String[]{
 						"", "&4&oV&7&oariable &4&oT&7&origger &4&oI&7&onformatorium", "",
+						"&3/vt reload",
+						"    &6- Reloads scripts and trigger files.",
+						"",
 						"&3/vt debug",
 						"    &6- Toggle debug mode on/off.",
 						"    &6- Displays errors within triggers to the console.",
@@ -420,7 +428,7 @@ public class VTCommandMain implements AR {
 				
 				if (!main.vars.getScripts().containsKey(args[1] + "_" + args[2])){
 					
-					File file = new File("./plugins/VariableTriggers/scripts/" + args[1] + ".script.yml");
+					File file = VTPaths.dataFile("scripts/" + args[1] + ".script.yml");
 					YamlConfiguration yaml = new YamlConfiguration();
 					
 					if (!file.exists()){
@@ -886,6 +894,32 @@ public class VTCommandMain implements AR {
 	
 	private String[] mkStr(String one, String two){
 		return new String[]{ one, two };
+	}
+
+	private void reloadAll(CommandSender sender) {
+		main.setup.scripts();
+		int failures = 0;
+		for (Object listener : main.setup.registeredClasses.values()) {
+			for (Method method : listener.getClass().getMethods()) {
+				if (method.getName().equals("loadAll")) {
+					try {
+						method.invoke(listener);
+					} catch (Exception e) {
+						failures++;
+						main.logger.warning("Failed to reload " + listener.getClass().getSimpleName() + ".");
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		main.areas.load();
+		main.clicks.load();
+		main.walks.load();
+		if (failures == 0) {
+			VTUtils.s(sender, "Reloaded all scripts and triggers.");
+		} else {
+			VTUtils.s(sender, "&eReloaded scripts and triggers with " + failures + " listener error(s); check the console.");
+		}
 	}
 	
 	private boolean permCheck(CommandSender p, String arg){

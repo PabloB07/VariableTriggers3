@@ -47,6 +47,7 @@ import com.github.lyokofirelyte.VariableTriggers.Identifiers.VTConfig;
 import com.github.lyokofirelyte.VariableTriggers.Identifiers.VTData;
 import com.github.lyokofirelyte.VariableTriggers.Identifiers.VTMap;
 import com.github.lyokofirelyte.VariableTriggers.Utils.VTUtils;
+import com.github.lyokofirelyte.VariableTriggers.Utils.VTPaths;
 import com.google.common.collect.Iterables;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -583,7 +584,7 @@ public class VTParser {
 				
 				case "@OPENINV":
 					
-					File invFile = new File("./plugins/VariableTriggers/inventories/" + args[1] + ".yml");
+					File invFile = VTPaths.dataFile("inventories/" + args[1] + ".yml");
 					
 					if (invFile.exists()){
 
