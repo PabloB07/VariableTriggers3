@@ -7,6 +7,9 @@ scheduled autosaving.
 This repository contains the VTV3 source code, updated from the legacy plugin. It targets Java 21 bytecode and Paper API
 1.21.4, with a runtime compatibility target of Java 21–25 and Paper 1.21.x–26.3.
 
+See [DOCUMENTACION.md](DOCUMENTACION.md) for the Spanish command reference and examples.
+See [DOCUMENTATION.md](DOCUMENTATION.md) for the English command reference and examples.
+
 ## Requirements
 
 - Paper 1.21.x–26.3 and Java 21–25 at runtime.
@@ -85,6 +88,9 @@ de un intérprete de scripts, variables, placeholders y guardado automático pro
 
 Este repositorio contiene el código fuente de VTV3, actualizado desde el plugin heredado. El proyecto genera bytecode
 Java 21 y apunta a Paper API 1.21.4, con compatibilidad objetivo de ejecución para Java 21–25 y Paper 1.21.x–26.3.
+
+Consulta [DOCUMENTACION.md](DOCUMENTACION.md) para ver los comandos y ejemplos de uso en español.
+Consulta [DOCUMENTATION.md](DOCUMENTATION.md) para ver los comandos y ejemplos de uso en inglés.
 
 ## Requisitos
 
