@@ -170,7 +170,7 @@ public class VTListener implements AR {
 			
 			if (main.clicks.containsKey(check + ".Script") && main.clicks.getLong(check + ".ActiveCooldown") <= System.currentTimeMillis()){
 				main.clicks.cooldown(check);
-				new VTParser(main, "ClickTriggers.yml", check, main.clicks.getList(check + ".Script"), l, new HashMap<String, String>(), e.getPlayer().getName()).start();
+				new VTParser(main, "ClickTriggers.yml", check, main.clicks.getList(check + ".Script"), l, getClickCustoms(e), e.getPlayer().getName()).start();
 			}
 		}
 		
@@ -229,6 +229,15 @@ public class VTListener implements AR {
 				}
 			}
 		}
+	}
+
+	private HashMap<String, String> getClickCustoms(PlayerInteractEvent event) {
+		HashMap<String, String> map = new HashMap<>();
+		map.put("<clicktype>", event.getAction().name());
+		map.put("<blockmaterial>", event.getClickedBlock().getType().name());
+		Location block = event.getClickedBlock().getLocation();
+		map.put("<blocklocation>", block.getWorld().getName() + " " + block.getBlockX() + " " + block.getBlockY() + " " + block.getBlockZ());
+		return map;
 	}
 	
 	public HashMap<String, String> getAreaCustoms(String name, String type){
