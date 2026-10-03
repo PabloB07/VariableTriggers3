@@ -371,35 +371,53 @@ public class VTParser {
 				break;
 				
 				case "@CALL":
-					
-					List<String> scripts = new ArrayList<String>();
-					int fails = 0;
-					
-					if (args[1].startsWith("this:")){
-						
-						for (String name : Arrays.asList("Player", "Entity", "System")){
+
+					if (args.length < 2) {
+						main.debug("@CALL format is @CALL <file>:<script>.", scriptName, line, fileName);
+						break;
+					}
+
+					String[] call = args[1].split(":", 2);
+					if (call.length != 2 || call[0].isEmpty() || call[1].isEmpty()) {
+						main.debug("@CALL format is @CALL <file>:<script>.", scriptName, line, fileName);
+						break;
+					}
+
+					List<String> scripts = null;
+					if (call[0].equalsIgnoreCase("this")) {
+						for (String listenerType : Arrays.asList("Player", "Entity", "System")) {
 							try {
-								scripts = new ArrayList<String>(((VTMap<Object, Object>) main.getInstance(Class.forName("com.github.lyokofirelyte.VariableTriggers.Events.Listeners." + name + "." + fileName.replace(".yml", "")))).getList(args[1].split("\\:")[1] + ".Script"));
-								break;
-							} catch (Exception e3){
-								fails++;
+								VTMap<Object, Object> event = (VTMap<Object, Object>) main.getInstance(
+									Class.forName("com.github.lyokofirelyte.VariableTriggers.Events.Listeners."
+										+ listenerType + "." + fileName.replace(".yml", ""))
+								);
+								String scriptPath = call[1] + ".Script";
+								if (event.containsKey(scriptPath)) {
+									scripts = new ArrayList<>(event.getList(scriptPath));
+									break;
+								}
+							} catch (ClassNotFoundException ignored) {
 							}
 						}
-					
-						if (fails >= 3){
-							main.debug("Could not find script!", scriptName, line, fileName);
-							return;
+					} else if (main.vars.getScripts() != null) {
+						scripts = main.vars.getScripts().get(call[0] + "_" + call[1]);
+						if (scripts != null) {
+							scripts = new ArrayList<>(scripts);
 						}
-						
-					} else {
-						scripts = new ArrayList<String>(main.vars.getScripts().get(args[1].split("\\:")[0] + "_" + args[1].split("\\:")[1]));
 					}
-					
-					try {
-						new VTParser(main, args[1].split("\\:")[0], args[1].split("\\:")[1], scripts, p != null ? p.getLocation() : new Location(Bukkit.getWorlds().get(0), 0, 0, 0), customPlaceHolders, sender).start();
-					} catch (Exception e){
-						main.debug("Error calling script!", scriptName, line, fileName);
+
+					if (scripts == null) {
+						String message = "Script '" + call[0] + ":" + call[1]
+							+ "' was not loaded. Check plugins/VariableTriggers3/scripts/" + call[0] + ".script.yml and run /vt reload.";
+						main.logger.warning(message);
+						main.debug(message, scriptName, line, fileName);
+						break;
 					}
+
+					Location callLocation = p != null
+						? p.getLocation()
+						: (triggerLoc != null ? triggerLoc : Bukkit.getWorlds().get(0).getSpawnLocation());
+					new VTParser(main, call[0], call[1], scripts, callLocation, customPlaceHolders, sender).start();
 					
 				break;
 				

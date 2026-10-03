@@ -79,7 +79,6 @@ public class VTListener implements AR {
 			
 			if (!obj.containsKey(l.getWorld().getName() + "." + loc + ".Script")){
 				obj.set(l.getWorld().getName() + "." + loc + ".Script", new ArrayList<String>(Arrays.asList(last)));
-				System.out.println("SCRIPT: " + last);
 				obj.set(l.getWorld().getName() + "." + loc + ".Cooldown", 1);
 			} else {
 				obj.getList(l.getWorld().getName() + "." + loc + ".Script").add(last);
